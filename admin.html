@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>ADMIN</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<style>
+    body{
+        background-image: linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%);
+   
+    }
+    #tt{
+       height: 40%;
+       width: 30%;
+         margin-left: 35%;
+
+     
+    }
+   
+</style>
+
+<body>
+    <div class="container">
+
+        <form id="myForm" class="form-box search-form">
+            <div class="header-text">
+                Search for Booking
+            </div>
+
+          
+
+            </br>BRN+
+
+
+
+
+      
+        
+            <input class="form-control py-4" placeholder="Please input 5 digit number" type="text" name="bsearch" pattern="[0-9]{5}|\s|"  oninvalid="setCustomValidity ('Please only input 5 digit number');" oninput="setCustomValidity('');"/>
+
+            <input type="submit" name="sbutton" value="Search for Booking" />
+            <a href="booking.html" id="home" name="home">Back to booking page</a>
+
+        </form>
+        <div id="tt">
+        <img src="images/1223.png"></img>
+    </div>
+        <div class="cont">
+            <p id="assign" class="assign"></p>
+
+
+            <div class=”content” id="content">
+                <table align="center" id="tab">
+                    <tbody id="btab">
+                    </tbody>
+            </div>
+        </div>
+
+    </div>
+
+
+   <script type="text/javascript">
+    
+      var form = document.getElementById("myForm");
+      // event listener to search form
+      form.addEventListener("submit", function (event) {
+        document.getElementById("assign").innerHTML = "";
+        event.preventDefault();
+        getBooking();
+      });
+     
+      
+    function getBooking() {
+        // initialize xmlhttprequest
+        var XHR = new XMLHttpRequest();
+        // get form inputs
+        var FD = new FormData(form);
+    
+        XHR.addEventListener("load", function(data) {           
+        });
+        XHR.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            // get returned response and parse it to an array
+           var response = JSON.parse(this.responseText);
+           // get the table element to add rows from returned data
+           var content = document.getElementById("btab");
+            content.innerHTML = "";
+            content.innerHTML += "<tr><th>Booking Reference number</th><th>Customer Name</th><th>Phone</th><th>Pick-Up Suburb</th><th>Destination Buburb</th><th>Pick-Up Date/time</th><th>Status</th></tr>";
+            response.forEach(e => {
+              var refn= e.ref_num;
+               if (e.status == "unassigned") { // if unassigned we add a button to assign
+                            content.innerHTML += '<tr><td>' +"BRN"+ e.ref_num + '</td><td>' + e.cname + '</td><td>' + e.phone + '</td><td>' + e.sbname + '</td><td>' + e.dsbname + '</td><td>' + e.date + ' ' + e.time + '</td><td>' + e.status + ' <button onclick="assignBooking(' + refn + ')"> Assign </button> </td></tr>';
+                            console.log(refn);
+                        } else {
+                            content.innerHTML += '<tr><td>'+"BRN" + e.ref_num + '</td><td>' + e.cname + '</td><td>' + e.phone + '</td><td>' + e.sbname + '</td><td>' + e.dsbname + '</td><td>' + e.date + ' ' + e.time + '</td><td>' + e.status + ' </td></tr>';
+                        }            });
+        }};
+        // if ajax call didnt work ok
+        XHR.addEventListener("error", function(event) {
+          alert('Something went wrong');
+        });
+        // specify method and target url of the request 
+        XHR.open("POST", "admin.php");
+        XHR.send(FD);
+      }
+
+
+    function assignBooking(refnum) {
+      
+        var XHR = new XMLHttpRequest();
+        // get ref number 
+        var key = "refnum=";
+        var data = key.concat(refnum);
+        
+        XHR.addEventListener("load", function(data) {
+        });
+        XHR.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+           var response = JSON.parse(this.responseText);
+           var content = document.getElementById("assign");
+           content.innerHTML = response.result;
+           if(response.result == "success"){
+            content.innerHTML = response.success ;
+           }else{
+            content.innerHTML = response.failed ;
+           }
+           getBooking(); // update table results again
+           
+        }};
+        // if ajax call didnt work ok
+        XHR.addEventListener("error", function(event) {
+          alert('Something went wrong');
+        });
+        // specify method and target url of the request 
+        XHR.open("POST", "admin.php");
+        // type of sent data
+        XHR.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        XHR.send(data);
+      }
+        
+    </script>
+
+
+
+</body>
+
+</html>

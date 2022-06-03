@@ -1,0 +1,19 @@
+CREATE TABLE `booking` (
+  `ref_num` varchar(16) NOT NULL,
+  `cname` varchar(100) NOT NULL,
+  `phone` varchar(12) NOT NULL,
+  `unumber` varchar(100) DEFAULT NULL,
+  `snumber` varchar(100) NOT NULL,
+  `stname` varchar(100) NOT NULL,
+  `sbname` varchar(100) DEFAULT NULL,
+  `dsbname` varchar(100) DEFAULT NULL,
+  `date` date NOT NULL,
+  `time` time NOT NULL,
+  `datetime` datetime NOT NULL,
+  `status` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+ALTER TABLE `booking`
+  ADD PRIMARY KEY (`ref_num`);
+COMMIT;

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Cabs Online</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<style>
+body{
+  background:url('ta.gif');
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 100%;
+ 
+}
+</style>
+
+<body>
+<div class="container">
+
+    <div class="r-head">
+       
+        <p class="title"> Cabs Online</p>
+       
+     
+    </div>
+<div class="navbar">
+    <span><a href="booking.html" >Home</a></span>
+
+    
+    <span><a href="readme.txt" id="read">Readme</a></span>
+        <span> <a href="admin.html" id="admin">Admin</a></span>
+</div>
+    <div class="l-body">
+    <form id="myForm" class="form-box b-form">
+        <div class="header-text">
+			Booking Form
+		</div>
+        <p id="notvalid" class="notvalid" ></p>
+        <p name="reference" id="ref" class="ref"></p>
+        <div class="form-group">
+            <label class="small mb-1" >Name</label>
+            <input class="form-control py-4" type="text" name="cname" id="cname" required />
+        </div>
+        <div class="form-group">
+            <label class="small mb-1" >Phone Number</label>
+            <input class="form-control py-4" type="text" name="phone" id="phone" pattern="[0-9]*" minlength="10" maxlength="12" required />
+        </div>
+        <div class="form-group">
+            <label class="small mb-1" >Unit </label>
+            <input class="form-control py-4" type="text" name="unumber" id="unumber"  />
+        </div>
+        <div class="form-group">
+            <label class="small mb-1" >Street Number</label>
+            <input class="form-control py-4" type="text" name="snumber" id="snumber" required />
+        </div>
+        <div class="form-group">
+            <label class="small mb-1" >Street Name</label>
+            <input class="form-control py-4" type="text" name="stname" id="stname" required />
+        </div>
+        <div class="form-group">
+            <label class="small mb-1" >Suburb</label>
+            <input class="form-control py-4" type="text" name="sbname" id="sbname" />
+        </div>
+        <div class="form-group">
+            <label class="small mb-1" >Destination Suburb</label>
+            <input class="form-control py-4" type="text" name="dsbname" id="dsbname" />
+        </div>
+        <div class="form-group">
+            <label >Pick-Up Date</label>
+            <input class="form-control py-4" type="date" name="date" id="date" required />
+        </div>
+        <div class="form-group">
+            <label  >Pick-Up Time</label>
+            <input class="form-control py-4" type="time" name="time" id="time" required />
+        </div>
+       
+        <input type="submit" value="SUBMIT BOOKING">
+
+      
+
+    </form>
+    </div>
+  
+</div>
+
+
+<script type="text/javascript">
+window.addEventListener("load", function () {
+
+  // set current date and time inuser form
+  setDateTime();
+  var form = document.getElementById("myForm");
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if(validPickupDateTime()){ // cheking for pickup date/time if its valid (not earlier then "now"), before sending the request
+        var ref = document.getElementById("notvalid").innerHTML = "";
+        sendData();
+    }else{
+        document.getElementById("ref").innerHTML = "";
+        var ref = document.getElementById("notvalid").innerHTML = "&#10060 Pick-Up Date and Time Must Not Be Earlier than Current Date/Time" ; 
+    }
+    
+  });
+
+  
+  // same principe of senddata() in admin 
+  function sendData() {
+    var XHR = new XMLHttpRequest();
+    var FD = new FormData(form);
+
+    XHR.addEventListener("load", function(data) {
+        
+    });
+    XHR.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+       var response = JSON.parse(this.responseText);
+       document.getElementById("notvalid").innerHTML = "";
+       var ref = document.getElementById("ref");
+       ref.innerHTML = response.success ;
+       document.getElementById("cname").value = "";
+       document.getElementById("phone").value = "";
+       document.getElementById("unumber").value = "";
+       document.getElementById("snumber").value = "";
+       document.getElementById("stname").value = "";
+       document.getElementById("sbname").value = "";
+       document.getElementById("dsbname").value = "";
+       setDateTime();
+    }};
+    
+    XHR.addEventListener("error", function(event) {
+      alert('Something went wrong');
+    });
+    
+    XHR.open("POST", "booking.php");
+    XHR.send(FD);
+  }
+
+  // function to verify pick up date/time inputs entered by the user  
+    function validPickupDateTime(){
+    var pdate= document.getElementById('date').value;      
+    var ptime= document.getElementById('time').value;
+    var now = new Date();
+    var d = pdate.split("-");
+    var t = ptime.split(":");
+    var pickup = new Date(d[0],d[1]-1,d[2],t[0],t[1],'00');
+    //pickup加1分钟
+    pickup.setMinutes(pickup.getMinutes()+1);
+    console.log(now,pickup);
+    if(now <= pickup){
+        return true ;
+       
+        
+    }else{
+        return false ;
+    }
+    
+   
+  }
+
+  // function to set current date and time in client form
+  function setDateTime(){
+    var date = new Date();
+    var day = date.getDate(),
+    month = date.getMonth() + 1,
+    year = date.getFullYear(),
+    hour = date.getHours(),
+    min  = date.getMinutes();
+month = (month < 10 ? "0" : "") + month;
+day = (day < 10 ? "0" : "") + day;
+hour = (hour < 10 ? "0" : "") + hour;
+min = (min < 10 ? "0" : "") + min;
+var today = year + "-" + month + "-" + day,
+    displayTime = hour + ":" + min; 
+document.getElementById('date').value = today;      
+document.getElementById('time').value = displayTime;
+  }
+
+});
+
+
+</script>
+
+
+
+</body>
+</html>
